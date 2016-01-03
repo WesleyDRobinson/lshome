@@ -1,6 +1,4 @@
-### Wesley Robinson -- wesley.tech
+### Light & Sound is a tool to organize and share ideas - organized
 
-The thoughts and opinions expressed here are my own of course.
-
-Feel free to email me any questions or thoughts or suggestions
+Email me with questions, thoughts or suggestions regarding organizing and sharing ideas
 Robinson.WesleyD@gmail.com
