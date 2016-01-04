@@ -66,9 +66,7 @@ var imageOptimizeTask = function (src, dest) {
 };
 
 var optimizeHtmlTask = function (src, dest) {
-  var assets = $.useref.assets({
-    searchPath: ['.tmp', 'app', dist()]
-  });
+  var assets = $.useref.assets();
 
   return gulp.src(src)
     // Replace path for vulcanized assets
@@ -180,7 +178,7 @@ gulp.task('fonts', function () {
 // Scan your HTML for assets & optimize them
 gulp.task('html', function () {
   return optimizeHtmlTask(
-    ['app/**/*.html', '!app/{elements,test}/**/*.html'],
+    [dist('/**/*.html'), '!' + dist('/{elements,test}/**/*.html')],
     dist());
 });
 
@@ -238,7 +236,7 @@ gulp.task('clean', function () {
 });
 
 // Watch files for changes & reload
-gulp.task('serve', ['lint', 'styles', 'elements', 'images'], function () {
+gulp.task('serve', ['lint', 'styles', 'elements', 'images', 'js'], function () {
   browserSync({
     port: 5000,
     notify: false,
@@ -264,10 +262,10 @@ gulp.task('serve', ['lint', 'styles', 'elements', 'images'], function () {
     }
   });
 
-  gulp.watch(['app/**/*.html'], reload);
+  gulp.watch(['app/**/*.html'], ['js', reload]);
   gulp.watch(['app/styles/**/*.css'], ['styles', reload]);
   gulp.watch(['app/elements/**/*.css'], ['elements', reload]);
-  gulp.watch(['app/{scripts,elements}/**/{*.js,*.html}'], ['lint']);
+  gulp.watch(['app/{scripts,elements}/**/{*.js,*.html}'], ['lint', 'js']);
   gulp.watch(['app/images/**/*'], reload);
 });
 
@@ -299,7 +297,7 @@ gulp.task('default', ['clean'], function (cb) {
   // Uncomment 'cache-config' if you are going to use service workers.
   runSequence(
     ['copy', 'styles'],
-    'elements',
+    ['elements', 'js'],
     ['lint', 'images', 'fonts', 'html'],
     'vulcanize', // 'cache-config',
     cb);
