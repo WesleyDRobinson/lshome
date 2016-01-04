@@ -1,11 +1,11 @@
 /*
-Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
-This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
-The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
-The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
-Code distributed by Google as part of the polymer project is also
-subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
-*/
+ Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+ This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+ The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+ The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+ Code distributed by Google as part of the polymer project is also
+ subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+ */
 
 'use strict';
 
@@ -39,12 +39,12 @@ var AUTOPREFIXER_BROWSERS = [
 
 var DIST = 'dist';
 
-var dist = function(subpath) {
+var dist = function (subpath) {
   return !subpath ? DIST : path.join(DIST, subpath);
 };
 
-var styleTask = function(stylesPath, srcs) {
-  return gulp.src(srcs.map(function(src) {
+var styleTask = function (stylesPath, srcs) {
+  return gulp.src(srcs.map(function (src) {
       return path.join('app', stylesPath, src);
     }))
     .pipe($.changed(stylesPath, {extension: '.css'}))
@@ -55,7 +55,7 @@ var styleTask = function(stylesPath, srcs) {
     .pipe($.size({title: stylesPath}));
 };
 
-var imageOptimizeTask = function(src, dest) {
+var imageOptimizeTask = function (src, dest) {
   return gulp.src(src)
     .pipe($.imagemin({
       progressive: true,
@@ -65,7 +65,7 @@ var imageOptimizeTask = function(src, dest) {
     .pipe($.size({title: 'images'}));
 };
 
-var optimizeHtmlTask = function(src, dest) {
+var optimizeHtmlTask = function (src, dest) {
   var assets = $.useref.assets({
     searchPath: ['.tmp', 'app', dist()]
   });
@@ -97,16 +97,16 @@ var optimizeHtmlTask = function(src, dest) {
 };
 
 // Compile and automatically prefix stylesheets
-gulp.task('styles', function() {
+gulp.task('styles', function () {
   return styleTask('styles', ['**/*.css']);
 });
 
-gulp.task('elements', function() {
+gulp.task('elements', function () {
   return styleTask('elements', ['**/*.css']);
 });
 
 // Lint JavaScript
-gulp.task('lint', function() {
+gulp.task('lint', function () {
   return gulp.src([
       'app/scripts/**/*.js',
       'app/elements/**/*.js',
@@ -118,22 +118,22 @@ gulp.task('lint', function() {
       once: true
     }))
 
-  // JSCS has not yet a extract option
-  .pipe($.if('*.html', $.htmlExtract()))
-  .pipe($.jshint())
-  .pipe($.jscs())
-  .pipe($.jscsStylish.combineWithHintResults())
-  .pipe($.jshint.reporter('jshint-stylish'))
-  .pipe($.if(!browserSync.active, $.jshint.reporter('fail')));
+    // JSCS has not yet a extract option
+    .pipe($.if('*.html', $.htmlExtract()))
+    .pipe($.jshint())
+    .pipe($.jscs())
+    .pipe($.jscsStylish.combineWithHintResults())
+    .pipe($.jshint.reporter('jshint-stylish'))
+    .pipe($.if(!browserSync.active, $.jshint.reporter('fail')));
 });
 
 // Optimize images
-gulp.task('images', function() {
+gulp.task('images', function () {
   return imageOptimizeTask('app/images/**/*', dist('images'));
 });
 
 // Copy all files at the root level (app)
-gulp.task('copy', function() {
+gulp.task('copy', function () {
   var app = gulp.src([
     'app/*',
     '!app/test',
@@ -169,7 +169,7 @@ gulp.task('copy', function() {
 });
 
 // Copy web fonts to dist
-gulp.task('fonts', function() {
+gulp.task('fonts', function () {
   return gulp.src(['app/fonts/**'])
     .pipe(gulp.dest(dist('fonts')))
     .pipe($.size({
@@ -178,14 +178,14 @@ gulp.task('fonts', function() {
 });
 
 // Scan your HTML for assets & optimize them
-gulp.task('html', function() {
+gulp.task('html', function () {
   return optimizeHtmlTask(
     ['app/**/*.html', '!app/{elements,test}/**/*.html'],
     dist());
 });
 
 // Vulcanize granular configuration
-gulp.task('vulcanize', function() {
+gulp.task('vulcanize', function () {
   var DEST_DIR = dist('elements');
   return gulp.src(dist('elements/elements.vulcanized.html'))
     .pipe($.vulcanize({
@@ -204,7 +204,7 @@ gulp.task('vulcanize', function() {
 // in your project, please enable it within the 'default' task.
 // See https://github.com/PolymerElements/polymer-starter-kit#enable-service-worker-support
 // for more context.
-gulp.task('cache-config', function(callback) {
+gulp.task('cache-config', function (callback) {
   var dir = dist();
   var config = {
     cacheId: packageJson.name || path.basename(__dirname),
@@ -212,33 +212,33 @@ gulp.task('cache-config', function(callback) {
   };
 
   glob([
-    'index.html',
-    './',
-    'bower_components/webcomponentsjs/webcomponents-lite.min.js',
-    '{elements,scripts,styles}/**/*.*'],
-    {cwd: dir}, function(error, files) {
-    if (error) {
-      callback(error);
-    } else {
-      config.precache = files;
+      'index.html',
+      './',
+      'bower_components/webcomponentsjs/webcomponents-lite.min.js',
+      '{elements,scripts,styles}/**/*.*'],
+    {cwd: dir}, function (error, files) {
+      if (error) {
+        callback(error);
+      } else {
+        config.precache = files;
 
-      var md5 = crypto.createHash('md5');
-      md5.update(JSON.stringify(config.precache));
-      config.precacheFingerprint = md5.digest('hex');
+        var md5 = crypto.createHash('md5');
+        md5.update(JSON.stringify(config.precache));
+        config.precacheFingerprint = md5.digest('hex');
 
-      var configPath = path.join(dir, 'cache-config.json');
-      fs.writeFile(configPath, JSON.stringify(config), callback);
-    }
-  });
+        var configPath = path.join(dir, 'cache-config.json');
+        fs.writeFile(configPath, JSON.stringify(config), callback);
+      }
+    });
 });
 
 // Clean output directory
-gulp.task('clean', function() {
+gulp.task('clean', function () {
   return del(['.tmp', dist()]);
 });
 
 // Watch files for changes & reload
-gulp.task('serve', ['lint', 'styles', 'elements', 'images'], function() {
+gulp.task('serve', ['lint', 'styles', 'elements', 'images'], function () {
   browserSync({
     port: 5000,
     notify: false,
@@ -246,7 +246,7 @@ gulp.task('serve', ['lint', 'styles', 'elements', 'images'], function() {
     snippetOptions: {
       rule: {
         match: '<span id="browser-sync-binding"></span>',
-        fn: function(snippet) {
+        fn: function (snippet) {
           return snippet;
         }
       }
@@ -272,7 +272,7 @@ gulp.task('serve', ['lint', 'styles', 'elements', 'images'], function() {
 });
 
 // Build and serve the output from the dist build
-gulp.task('serve:dist', ['default'], function() {
+gulp.task('serve:dist', ['default'], function () {
   browserSync({
     port: 5001,
     notify: false,
@@ -280,7 +280,7 @@ gulp.task('serve:dist', ['default'], function() {
     snippetOptions: {
       rule: {
         match: '<span id="browser-sync-binding"></span>',
-        fn: function(snippet) {
+        fn: function (snippet) {
           return snippet;
         }
       }
@@ -295,7 +295,7 @@ gulp.task('serve:dist', ['default'], function() {
 });
 
 // Build production files, the default task
-gulp.task('default', ['clean'], function(cb) {
+gulp.task('default', ['clean'], function (cb) {
   // Uncomment 'cache-config' if you are going to use service workers.
   runSequence(
     ['copy', 'styles'],
@@ -306,7 +306,7 @@ gulp.task('default', ['clean'], function(cb) {
 });
 
 // Build then deploy to GitHub pages gh-pages branch
-gulp.task('build-deploy-gh-pages', function(cb) {
+gulp.task('build-deploy-gh-pages', function (cb) {
   runSequence(
     'default',
     'deploy-gh-pages',
@@ -314,7 +314,7 @@ gulp.task('build-deploy-gh-pages', function(cb) {
 });
 
 // Deploy to GitHub pages gh-pages branch
-gulp.task('deploy-gh-pages', function() {
+gulp.task('deploy-gh-pages', function () {
   return gulp.src(dist('**/*'))
     // Check if running task from Travis Cl, if so run using GH_TOKEN
     // otherwise run using ghPages defaults.
@@ -325,6 +325,21 @@ gulp.task('deploy-gh-pages', function() {
     }), $.ghPages()));
 });
 
+
+// Transpile all JS to ES5.
+gulp.task('js', function () {
+  return gulp.src(['app/**/*.{js,html}'])
+    .pipe($.sourcemaps.init())
+    .pipe($.if('*.html', $.crisper())) // Extract JS from .html files
+    .pipe($.if('*.js', $.babel({
+      presets: ['es2015']
+    })))
+    .pipe($.sourcemaps.write('.'))
+    .pipe(gulp.dest('.tmp/'))
+    .pipe(gulp.dest(dist()));
+});
+
+
 // Load tasks for web-component-tester
 // Adds tasks for `gulp test:local` and `gulp test:remote`
 require('web-component-tester').gulp.init(gulp);
@@ -332,4 +347,5 @@ require('web-component-tester').gulp.init(gulp);
 // Load custom tasks from the `tasks` directory
 try {
   require('require-dir')('tasks');
-} catch (err) {}
+} catch (err) {
+}
